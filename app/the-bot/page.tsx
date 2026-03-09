@@ -1933,12 +1933,15 @@ export default function TheBotPage(): React.JSX.Element {
       </main>
 
       {modalOpen && (
-  <SignUpModal
-    onClose={() => setModalOpen(false)}
-    onSuccess={(email) => {
-      localStorage.setItem("pw_user_email", email);
-      setUserEmail(email);
-      setModalOpen(false);
-    }}
-  />
-)}
+        <SignUpModal
+          onClose={() => setModalOpen(false)}
+          onSuccess={(email) => {
+            localStorage.setItem("pw_user_email", email);
+            setUserEmail(email);
+            setModalOpen(false);
+          }}
+        />
+      )}
+    </div>
+  );
+}
