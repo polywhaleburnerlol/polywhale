@@ -29,6 +29,8 @@ import {
   X,
   ChevronRight,
   ExternalLink,
+  User,
+  Key,
 } from "lucide-react";
 
 /* ─── palette (matches homepage exactly) ─── */
@@ -160,14 +162,22 @@ function GlobalStyles(): React.JSX.Element {
 function Header({
   isSubscribed,
   setIsSubscribed,
+  onOpenModal,
+  userEmail,
+  onSignOut,
 }: {
   isSubscribed: boolean;
   setIsSubscribed: (v: boolean) => void;
+  onOpenModal: () => void;
+  userEmail: string | null;
+  onSignOut: () => void;
 }): React.JSX.Element {
-  const [scrolled, setScrolled] = useState<boolean>(false);
-  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
+  const [scrolled, setScrolled]       = useState<boolean>(false);
+  const [mobileOpen, setMobileOpen]   = useState<boolean>(false);
   const [socialsOpen, setSocialsOpen] = useState<boolean>(false);
-  const socialsRef = useRef<HTMLDivElement>(null);
+  const [accountOpen, setAccountOpen] = useState<boolean>(false);
+  const socialsRef                    = useRef<HTMLDivElement>(null);
+  const accountRef                    = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -175,12 +185,13 @@ function Header({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Close socials dropdown when clicking outside */
+  /* Close dropdowns when clicking outside */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (socialsRef.current && !socialsRef.current.contains(e.target as Node)) {
+      if (socialsRef.current && !socialsRef.current.contains(e.target as Node))
         setSocialsOpen(false);
-      }
+      if (accountRef.current && !accountRef.current.contains(e.target as Node))
+        setAccountOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -415,6 +426,92 @@ function Header({
               />
             </div>
           </button>
+
+          {/* ── Create Account / My Account ── */}
+          {userEmail ? (
+            <div ref={accountRef} style={{ position: "relative" }}>
+              <button
+                onClick={() => setAccountOpen((v) => !v)}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "8px 16px", borderRadius: 10,
+                  border: "1px solid rgba(0,229,204,0.3)",
+                  background: "rgba(0,229,204,0.08)",
+                  color: COLORS.accent, fontSize: 13, fontWeight: 700,
+                  cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+                  whiteSpace: "nowrap", transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,229,204,0.14)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,229,204,0.08)"; }}
+              >
+                <User size={14} />
+                My Account
+                <ChevronRight size={12} style={{ transform: accountOpen ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+              </button>
+
+              {accountOpen && (
+                <div style={{
+                  position: "absolute", top: "calc(100% + 12px)", right: 0,
+                  minWidth: 240, borderRadius: 14,
+                  background: "rgba(10,16,36,0.98)",
+                  backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+                  border: "1px solid rgba(0,229,204,0.12)",
+                  boxShadow: "0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,229,204,0.04)",
+                  padding: "8px", animation: "fade-in-up 0.15s ease both", zIndex: 200,
+                }}>
+                  <div style={{ padding: "12px 14px 10px", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: 6 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.textSecondary, marginBottom: 8 }}>Signed in as</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #00e5cc, #7c5cfc)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <User size={15} color="#060b18" />
+                      </div>
+                      <div style={{ overflow: "hidden" }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userEmail}</p>
+                        <p style={{ fontSize: 11, color: COLORS.textSecondary, marginTop: 1 }}>Password: ••••••••</p>
+                      </div>
+                    </div>
+                  </div>
+                  {[
+                    { label: "Dashboard", href: "/dashboard", icon: <Activity size={13} /> },
+                    { label: "Pricing",   href: "/pricing",   icon: <TrendingUp size={13} /> },
+                  ].map(({ label, href, icon }) => (
+                    <a key={label} href={href} onClick={() => setAccountOpen(false)}
+                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", borderRadius: 8, textDecoration: "none", color: COLORS.textPrimary, fontSize: 13, fontWeight: 600, transition: "background 0.15s, color 0.15s" }}
+                      onMouseEnter={(e) => { const t = e.currentTarget as HTMLAnchorElement; t.style.background = "rgba(0,229,204,0.07)"; t.style.color = COLORS.accent; }}
+                      onMouseLeave={(e) => { const t = e.currentTarget as HTMLAnchorElement; t.style.background = "transparent"; t.style.color = COLORS.textPrimary; }}
+                    >
+                      {icon} {label}
+                    </a>
+                  ))}
+                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 6, paddingTop: 6 }}>
+                    <button
+                      onClick={() => { onSignOut(); setAccountOpen(false); }}
+                      style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", borderRadius: 8, background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 13, fontWeight: 600, transition: "background 0.15s" }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.08)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                    >
+                      <Key size={13} /> Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={onOpenModal}
+              className="btn-shimmer font-display"
+              style={{
+                padding: "9px 20px", borderRadius: 10, border: "none",
+                color: "#060b18", fontWeight: 700, fontSize: 13,
+                cursor: "pointer", whiteSpace: "nowrap",
+                transition: "transform 0.2s, box-shadow 0.2s",
+              }}
+              onMouseEnter={(e) => { const t = e.currentTarget as HTMLButtonElement; t.style.transform = "translateY(-1px)"; t.style.boxShadow = "0 6px 24px rgba(0,229,204,0.4)"; }}
+              onMouseLeave={(e) => { const t = e.currentTarget as HTMLButtonElement; t.style.transform = "translateY(0)"; t.style.boxShadow = "none"; }}
+            >
+              Create Account
+            </button>
+          )}
         </nav>
 
         {/* Mobile hamburger */}
@@ -503,9 +600,165 @@ function Header({
             {isSubscribed ? <Eye size={14} /> : <EyeOff size={14} />}
             {isSubscribed ? "PRO Active — Click to disable" : "Free Tier — Click to upgrade"}
           </button>
+
+          {/* Create Account / My Account — mobile */}
+          <div style={{ paddingTop: 4 }}>
+            {userEmail ? (
+              <div style={{ borderRadius: 12, border: "1px solid rgba(0,229,204,0.12)", overflow: "hidden" }}>
+                <div style={{ padding: "14px 16px", background: "rgba(0,229,204,0.05)", borderBottom: "1px solid rgba(0,229,204,0.08)" }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.textSecondary, marginBottom: 6 }}>Signed in as</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{userEmail}</p>
+                  <p style={{ fontSize: 11, color: COLORS.textSecondary, marginTop: 2 }}>Password: ••••••••</p>
+                </div>
+                <button
+                  onClick={() => { onSignOut(); setMobileOpen(false); }}
+                  style={{ width: "100%", padding: "12px 16px", background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 8, fontFamily: "DM Sans, sans-serif" }}
+                >
+                  <Key size={14} /> Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => { onOpenModal(); setMobileOpen(false); }}
+                className="btn-shimmer font-display"
+                style={{ width: "100%", padding: "13px 16px", borderRadius: 10, border: "none", color: "#060b18", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+              >
+                Create Account
+              </button>
+            )}
+          </div>
         </div>
       )}
     </header>
+  );
+}
+
+/* ═══════════════════════════════════════
+   SIGN-UP MODAL
+   ═══════════════════════════════════════ */
+function SignUpModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (email: string) => void }): React.JSX.Element {
+  const [email, setEmail]           = useState<string>("");
+  const [password, setPassword]     = useState<string>("");
+  const [showPass, setShowPass]     = useState<boolean>(false);
+  const [focusedField, setFocused]  = useState<string | null>(null);
+  const [loading, setLoading]       = useState<boolean>(false);
+  const [error, setError]           = useState<string | null>(null);
+  const [fieldErrs, setFieldErrs]   = useState<{ email?: string; password?: string }>({});
+
+  const handleBackdrop = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  const strength = (() => {
+    let s = 0;
+    if (password.length >= 8)           s++;
+    if (password.length >= 12)          s++;
+    if (/[A-Z]/.test(password))         s++;
+    if (/[0-9]/.test(password))         s++;
+    if (/[^A-Za-z0-9]/.test(password))  s++;
+    return s;
+  })();
+  const strengthLabel = ["", "Weak", "Fair", "Good", "Strong", "Excellent"][strength] ?? "";
+  const strengthColor = strength <= 1 ? "#ef4444" : strength === 2 ? "#f59e0b" : strength === 3 ? "#eab308" : "#00e5cc";
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errs: { email?: string; password?: string } = {};
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = "Please enter a valid email address.";
+    if (!password || password.length < 8) errs.password = "Password must be at least 8 characters.";
+    if (Object.keys(errs).length) { setFieldErrs(errs); return; }
+    setFieldErrs({}); setError(null); setLoading(true);
+    try {
+      const res  = await fetch("/api/signup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
+      const data = await res.json();
+      if (!res.ok) { setError(data.message ?? "Something went wrong. Please try again."); }
+      else         { onSuccess(email); }
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const inputStyle = (field: string, hasErr: boolean): React.CSSProperties => ({
+    width: "100%", background: "rgba(255,255,255,0.04)",
+    border: `1px solid ${hasErr ? "rgba(239,68,68,0.6)" : focusedField === field ? "rgba(0,229,204,0.5)" : "rgba(255,255,255,0.08)"}`,
+    boxShadow: focusedField === field && !hasErr ? "0 0 0 3px rgba(0,229,204,0.08)" : "none",
+    borderRadius: 10, padding: "13px 16px", color: COLORS.textPrimary,
+    fontFamily: "DM Sans, sans-serif", fontSize: 15, outline: "none",
+    transition: "border-color 0.2s, box-shadow 0.2s",
+  });
+
+  return (
+    <div onClick={handleBackdrop} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(6,11,24,0.85)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", animation: "fade-in-up 0.2s ease both" }}>
+      <div style={{ width: "100%", maxWidth: 440, background: "rgba(10,16,36,0.97)", border: "1px solid rgba(0,229,204,0.12)", borderRadius: 20, padding: "40px 36px", position: "relative", boxShadow: "0 0 0 1px rgba(0,229,204,0.06), 0 32px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: 0, left: "-50%", right: "-50%", height: 1, background: "linear-gradient(90deg, transparent, #00e5cc, #7c5cfc, transparent)", opacity: 0.6 }} />
+        <button onClick={onClose} style={{ position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: COLORS.textSecondary, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+          onMouseEnter={(e) => { const t = e.currentTarget as HTMLButtonElement; t.style.borderColor = "rgba(0,229,204,0.35)"; t.style.color = COLORS.accent; }}
+          onMouseLeave={(e) => { const t = e.currentTarget as HTMLButtonElement; t.style.borderColor = "rgba(255,255,255,0.08)"; t.style.color = COLORS.textSecondary; }}>
+          <XIcon size={14} />
+        </button>
+        <div style={{ marginBottom: 28, textAlign: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 16 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #00e5cc, #7c5cfc)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Waves size={18} color="#060b18" strokeWidth={2.5} />
+            </div>
+            <span className="font-display" style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>Poly<span style={{ color: COLORS.accent }}>Whale</span></span>
+          </div>
+          <h2 className="font-display" style={{ fontSize: 22, fontWeight: 700, color: "#fff", letterSpacing: "-0.02em", marginBottom: 6 }}>Create your account</h2>
+          <p style={{ fontSize: 14, color: COLORS.textSecondary, lineHeight: 1.5 }}>Join thousands of traders mirroring smart money.</p>
+        </div>
+        {error && (
+          <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 10, padding: "12px 14px", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
+            <Shield size={14} color="#ef4444" style={{ flexShrink: 0 }} />
+            <p style={{ fontSize: 13, color: "#ef4444", lineHeight: 1.5 }}>{error}</p>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8, color: focusedField === "email" ? COLORS.accent : COLORS.textSecondary, transition: "color 0.2s" }}>Email address</label>
+            <input type="email" value={email} required autoComplete="email" onChange={(e) => setEmail(e.target.value)} onFocus={() => setFocused("email")} onBlur={() => setFocused(null)} placeholder="you@example.com" style={inputStyle("email", !!fieldErrs.email)} />
+            {fieldErrs.email && <p style={{ marginTop: 5, fontSize: 12, color: "#ef4444" }}>{fieldErrs.email}</p>}
+          </div>
+          <div>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8, color: focusedField === "password" ? COLORS.accent : COLORS.textSecondary, transition: "color 0.2s" }}>Password</label>
+            <div style={{ position: "relative" }}>
+              <input type={showPass ? "text" : "password"} value={password} required autoComplete="new-password" onChange={(e) => setPassword(e.target.value)} onFocus={() => setFocused("password")} onBlur={() => setFocused(null)} placeholder="Min. 8 characters" style={{ ...inputStyle("password", !!fieldErrs.password), paddingRight: 44 }} />
+              <button type="button" tabIndex={-1} onClick={() => setShowPass((v) => !v)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: COLORS.textSecondary, display: "flex", alignItems: "center" }}>
+                {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+            {password && (
+              <div style={{ marginTop: 8 }}>
+                <div style={{ display: "flex", gap: 4, marginBottom: 4 }}>
+                  {[1,2,3,4,5].map((i) => (<div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= strength ? strengthColor : "rgba(255,255,255,0.08)", transition: "background 0.3s" }} />))}
+                </div>
+                <span style={{ fontSize: 11, color: strengthColor, letterSpacing: "0.06em" }}>{strengthLabel}</span>
+              </div>
+            )}
+            {fieldErrs.password && <p style={{ marginTop: 5, fontSize: 12, color: "#ef4444" }}>{fieldErrs.password}</p>}
+          </div>
+          <button type="submit" disabled={loading} className={loading ? "" : "btn-shimmer font-display"}
+            style={{ marginTop: 4, width: "100%", padding: "14px", borderRadius: 12, border: "none", background: loading ? "rgba(0,229,204,0.3)" : undefined, color: loading ? "rgba(255,255,255,0.5)" : "#060b18", fontWeight: 700, fontSize: 16, fontFamily: "Syne, sans-serif", cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "transform 0.2s, box-shadow 0.2s" }}
+            onMouseEnter={(e) => { if (!loading) { const t = e.currentTarget as HTMLButtonElement; t.style.transform = "translateY(-1px)"; t.style.boxShadow = "0 8px 28px rgba(0,229,204,0.4)"; } }}
+            onMouseLeave={(e) => { const t = e.currentTarget as HTMLButtonElement; t.style.transform = "translateY(0)"; t.style.boxShadow = "none"; }}>
+            {loading ? (<><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: "spin 0.8s linear infinite" }}><style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" strokeDasharray="28" strokeDashoffset="10" strokeLinecap="round" /></svg>Creating account…</>) : (<><User size={16} /> Start trading free →</>)}
+          </button>
+          <p style={{ textAlign: "center", fontSize: 12, color: "rgba(130,146,166,0.6)", lineHeight: 1.6 }}>
+            Already have an account?{" "}<a href="/login" style={{ color: COLORS.accent, textDecoration: "none", fontWeight: 600 }}>Sign in</a>
+          </p>
+        </form>
+      </div>
+    </div>
   );
 }
 
@@ -1140,8 +1393,13 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }): Reac
    MAIN PAGE
    ═══════════════════════════════════════ */
 export default function PricingPage(): React.JSX.Element {
-  const [annual, setAnnual] = useState<boolean>(false);
+  const [annual, setAnnual]           = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [modalOpen, setModalOpen]     = useState<boolean>(false);
+  const [userEmail, setUserEmail]     = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("pw_user_email");
+  });
 
   const roadmapItems: RoadmapFeature[] = [
     {
@@ -1230,7 +1488,16 @@ export default function PricingPage(): React.JSX.Element {
         }}
       />
 
-      <Header isSubscribed={isSubscribed} setIsSubscribed={setIsSubscribed} />
+      <Header
+        isSubscribed={isSubscribed}
+        setIsSubscribed={setIsSubscribed}
+        onOpenModal={() => setModalOpen(true)}
+        userEmail={userEmail}
+        onSignOut={() => {
+          localStorage.removeItem("pw_user_email");
+          setUserEmail(null);
+        }}
+      />
 
       <main style={{ position: "relative" }}>
         {/* ─── Hero ─── */}
@@ -1484,6 +1751,7 @@ export default function PricingPage(): React.JSX.Element {
               <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
                 <button
                   className="btn-shimmer font-display"
+                  onClick={() => setModalOpen(true)}
                   style={{
                     padding: "14px 32px",
                     borderRadius: 12,
@@ -1590,6 +1858,17 @@ export default function PricingPage(): React.JSX.Element {
           </div>
         </footer>
       </main>
+
+      {modalOpen && (
+        <SignUpModal
+          onClose={() => setModalOpen(false)}
+          onSuccess={(email) => {
+            localStorage.setItem("pw_user_email", email);
+            setUserEmail(email);
+            setModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
