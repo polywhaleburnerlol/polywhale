@@ -1885,7 +1885,10 @@ function FinalCTA(): React.JSX.Element {
 export default function TheBotPage(): React.JSX.Element {
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
   const [modalOpen, setModalOpen]       = useState<boolean>(false);
-  const [userEmail, setUserEmail]       = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(() => {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("pw_user_email");
+});
 
   return (
     <div style={{ background: COLORS.bg, minHeight: "100vh" }}>
@@ -1932,7 +1935,15 @@ export default function TheBotPage(): React.JSX.Element {
       {modalOpen && (
         <SignUpModal
           onClose={() => setModalOpen(false)}
-          onSuccess={(email) => { setUserEmail(email); setModalOpen(false); }}
+         onSuccess={(email) => {
+  localStorage.setItem("pw_user_email", email);
+  setUserEmail(email);
+  setModalOpen(false);
+}}
+onSignOut={() => {
+  localStorage.removeItem("pw_user_email");
+  setUserEmail(null);
+}}
         />
       )}
     </div>
