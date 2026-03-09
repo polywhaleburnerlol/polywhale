@@ -939,6 +939,7 @@ interface PricingTier {
   popular: boolean;
   features: { text: string; included: boolean; highlight?: boolean; comingSoon?: boolean }[];
   ctaText: string;
+  stripeUrl?: string;
   borderColor: string;
   glowAnimation: string;
 }
@@ -1086,45 +1087,87 @@ function PricingCard({
         </div>
 
         {/* CTA */}
-        <button
-          className={tier.popular ? "btn-shimmer-purple font-display" : "font-display"}
-          style={{
-            width: "100%",
-            padding: "14px 24px",
-            borderRadius: 12,
-            border: tier.popular ? "none" : `1px solid ${tier.borderColor}`,
-            cursor: "pointer",
-            color: tier.popular ? "#fff" : COLORS.textPrimary,
-            background: tier.popular
-              ? undefined
-              : price === 0
-                ? "rgba(255,255,255,0.04)"
+        {tier.stripeUrl ? (
+          <a
+            href={tier.stripeUrl}
+            className={tier.popular ? "btn-shimmer-purple font-display" : "font-display"}
+            style={{
+              width: "100%",
+              padding: "14px 24px",
+              borderRadius: 12,
+              border: tier.popular ? "none" : `1px solid ${tier.borderColor}`,
+              cursor: "pointer",
+              color: tier.popular ? "#fff" : COLORS.textPrimary,
+              background: tier.popular
+                ? undefined
                 : "rgba(0,229,204,0.06)",
-            fontWeight: 700,
-            fontSize: 15,
-            fontFamily: "Syne, sans-serif",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            transition: "transform 0.2s, box-shadow 0.2s",
-            marginBottom: 28,
-          }}
-          onMouseEnter={(e) => {
-            const t = e.currentTarget as HTMLButtonElement;
-            t.style.transform = "translateY(-1px)";
-            t.style.boxShadow = tier.popular
-              ? "0 6px 24px rgba(124,92,252,0.4)"
-              : "0 4px 16px rgba(0,229,204,0.2)";
-          }}
-          onMouseLeave={(e) => {
-            const t = e.currentTarget as HTMLButtonElement;
-            t.style.transform = "translateY(0)";
-            t.style.boxShadow = "none";
-          }}
-        >
-          {tier.ctaText} <ArrowRight size={15} />
-        </button>
+              fontWeight: 700,
+              fontSize: 15,
+              fontFamily: "Syne, sans-serif",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              transition: "transform 0.2s, box-shadow 0.2s",
+              marginBottom: 28,
+              textDecoration: "none",
+            }}
+            onMouseEnter={(e) => {
+              const t = e.currentTarget as HTMLAnchorElement;
+              t.style.transform = "translateY(-1px)";
+              t.style.boxShadow = tier.popular
+                ? "0 6px 24px rgba(124,92,252,0.4)"
+                : "0 4px 16px rgba(0,229,204,0.2)";
+            }}
+            onMouseLeave={(e) => {
+              const t = e.currentTarget as HTMLAnchorElement;
+              t.style.transform = "translateY(0)";
+              t.style.boxShadow = "none";
+            }}
+          >
+            {tier.ctaText} <ArrowRight size={15} />
+          </a>
+        ) : (
+          <button
+            className={tier.popular ? "btn-shimmer-purple font-display" : "font-display"}
+            style={{
+              width: "100%",
+              padding: "14px 24px",
+              borderRadius: 12,
+              border: tier.popular ? "none" : `1px solid ${tier.borderColor}`,
+              cursor: "pointer",
+              color: tier.popular ? "#fff" : COLORS.textPrimary,
+              background: tier.popular
+                ? undefined
+                : price === 0
+                  ? "rgba(255,255,255,0.04)"
+                  : "rgba(0,229,204,0.06)",
+              fontWeight: 700,
+              fontSize: 15,
+              fontFamily: "Syne, sans-serif",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              transition: "transform 0.2s, box-shadow 0.2s",
+              marginBottom: 28,
+            }}
+            onMouseEnter={(e) => {
+              const t = e.currentTarget as HTMLButtonElement;
+              t.style.transform = "translateY(-1px)";
+              t.style.boxShadow = tier.popular
+                ? "0 6px 24px rgba(124,92,252,0.4)"
+                : "0 4px 16px rgba(0,229,204,0.2)";
+            }}
+            onMouseLeave={(e) => {
+              const t = e.currentTarget as HTMLButtonElement;
+              t.style.transform = "translateY(0)";
+              t.style.boxShadow = "none";
+            }}
+          >
+            {tier.ctaText} <ArrowRight size={15} />
+          </button>
+        )}
 
         {/* Divider */}
         <div
@@ -1197,6 +1240,7 @@ const TIERS: PricingTier[] = [
     icon: <Crown size={20} />,
     popular: true,
     ctaText: "Start Hunting",
+    stripeUrl: "https://buy.stripe.com/9B628q6bG7hH3DvcWw43S02",
     borderColor: "rgba(124,92,252,0.3)",
     glowAnimation: "glow-pulse-purple 3s ease-in-out infinite",
     features: [
@@ -1218,6 +1262,7 @@ const TIERS: PricingTier[] = [
     icon: <Sparkles size={20} />,
     popular: false,
     ctaText: "Go Institutional",
+    stripeUrl: "https://buy.stripe.com/9B6bJ0bw0bxXb5X9Kk43S01",
     borderColor: "rgba(251,191,36,0.25)",
     glowAnimation: "glow-pulse-cyan 3s ease-in-out infinite",
     features: [
