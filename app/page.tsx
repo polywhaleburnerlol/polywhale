@@ -2082,19 +2082,12 @@ export default function PolyWhaleApp(): React.JSX.Element {
       <CTABanner onOpenModal={() => setModalOpen(true)} />
       <Footer />
       {modalOpen && (
-        <SignUpModal
-          onClose={() => setModalOpen(false)}
-          onSuccess={(email) => {
-  localStorage.setItem("pw_user_email", email);
-  setUserEmail(email);
-  setModalOpen(false);
-}}
-onSignOut={() => {
-  localStorage.removeItem("pw_user_email");
-  setUserEmail(null);
-}}
-        />
-      )}
-    </div>
-  );
-}
+  <SignUpModal
+    onClose={() => setModalOpen(false)}
+    onSuccess={(email) => {
+      localStorage.setItem("pw_user_email", email);
+      setUserEmail(email);
+      setModalOpen(false);
+    }}
+  />
+)}
