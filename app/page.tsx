@@ -189,7 +189,7 @@ function useReveal(threshold: number = 0.15): React.RefObject<HTMLDivElement | n
 /* ═══════════════════════════════════════
    SIGN-UP MODAL
    ═══════════════════════════════════════ */
-function SignUpModal({ onClose }: { onClose: () => void }): React.JSX.Element {
+function SignUpModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (email: string) => void }): React.JSX.Element {
   const [email, setEmail]           = useState<string>("");
   const [password, setPassword]     = useState<string>("");
   const [showPass, setShowPass]     = useState<boolean>(false);
@@ -252,7 +252,7 @@ function SignUpModal({ onClose }: { onClose: () => void }): React.JSX.Element {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message ?? "Something went wrong. Please try again."); }
-      else         { window.location.href = "/pricing"; }
+      else         { onSuccess(email); window.location.href = "/pricing"; }
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -468,14 +468,32 @@ function SignUpModal({ onClose }: { onClose: () => void }): React.JSX.Element {
 function Header({
   isSubscribed,
   setIsSubscribed,
+  onOpenModal,
+  userEmail,
+  onSignOut,
 }: {
   isSubscribed: boolean;
   setIsSubscribed: (v: boolean) => void;
+  onOpenModal: () => void;
+  userEmail: string | null;
+  onSignOut: () => void;
 }): React.JSX.Element {
-  const [scrolled, setScrolled]       = useState<boolean>(false);
-  const [mobileOpen, setMobileOpen]   = useState<boolean>(false);
-  const [socialsOpen, setSocialsOpen] = useState<boolean>(false);
-  const socialsRef                    = useRef<HTMLDivElement>(null);
+  const [scrolled, setScrolled]         = useState<boolean>(false);
+  const [mobileOpen, setMobileOpen]     = useState<boolean>(false);
+  const [socialsOpen, setSocialsOpen]   = useState<boolean>(false);
+  const [accountOpen, setAccountOpen]   = useState<boolean>(false);
+  const socialsRef                      = useRef<HTMLDivElement>(null);
+  const accountRef                      = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setAccountOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -715,6 +733,99 @@ function Header({
               />
             </div>
           </button>
+
+          {/* ── Create Account / My Account ── */}
+          {userEmail ? (
+            <div ref={accountRef} style={{ position: "relative" }}>
+              <button
+                onClick={() => setAccountOpen((v) => !v)}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "8px 16px", borderRadius: 10,
+                  border: "1px solid rgba(0,229,204,0.3)",
+                  background: "rgba(0,229,204,0.08)",
+                  color: COLORS.accent, fontSize: 13, fontWeight: 700,
+                  cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+                  whiteSpace: "nowrap", transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,229,204,0.14)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,229,204,0.08)"; }}
+              >
+                <User size={14} />
+                My Account
+                <ChevronRight size={12} style={{ transform: accountOpen ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+              </button>
+
+              {accountOpen && (
+                <div style={{
+                  position: "absolute", top: "calc(100% + 12px)", right: 0,
+                  minWidth: 240, borderRadius: 14,
+                  background: "rgba(10,16,36,0.98)",
+                  backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+                  border: "1px solid rgba(0,229,204,0.12)",
+                  boxShadow: "0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,229,204,0.04)",
+                  padding: "8px",
+                  animation: "fade-in-up 0.15s ease both",
+                  zIndex: 200,
+                }}>
+                  {/* Account info */}
+                  <div style={{ padding: "12px 14px 10px", borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: 6 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.textSecondary, marginBottom: 8 }}>Signed in as</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #00e5cc, #7c5cfc)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <User size={15} color="#060b18" />
+                      </div>
+                      <div style={{ overflow: "hidden" }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userEmail}</p>
+                        <p style={{ fontSize: 11, color: COLORS.textSecondary, marginTop: 1 }}>Password: ••••••••</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Menu items */}
+                  {[
+                    { label: "Dashboard", href: "/dashboard", icon: <Activity size={13} /> },
+                    { label: "Pricing",   href: "/pricing",   icon: <TrendingUp size={13} /> },
+                  ].map(({ label, href, icon }) => (
+                    <a key={label} href={href} onClick={() => setAccountOpen(false)}
+                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", borderRadius: 8, textDecoration: "none", color: COLORS.textPrimary, fontSize: 13, fontWeight: 600, transition: "background 0.15s, color 0.15s" }}
+                      onMouseEnter={(e) => { const t = e.currentTarget as HTMLAnchorElement; t.style.background = "rgba(0,229,204,0.07)"; t.style.color = COLORS.accent; }}
+                      onMouseLeave={(e) => { const t = e.currentTarget as HTMLAnchorElement; t.style.background = "transparent"; t.style.color = COLORS.textPrimary; }}
+                    >
+                      {icon} {label}
+                    </a>
+                  ))}
+
+                  {/* Sign out */}
+                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 6, paddingTop: 6 }}>
+                    <button
+                      onClick={() => { onSignOut(); setAccountOpen(false); }}
+                      style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", borderRadius: 8, background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 13, fontWeight: 600, transition: "background 0.15s" }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,68,68,0.08)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                    >
+                      <Key size={13} /> Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={onOpenModal}
+              className="btn-shimmer font-display"
+              style={{
+                padding: "9px 20px", borderRadius: 10, border: "none",
+                color: "#060b18", fontWeight: 700, fontSize: 13,
+                cursor: "pointer", whiteSpace: "nowrap",
+                transition: "transform 0.2s, box-shadow 0.2s",
+              }}
+              onMouseEnter={(e) => { const t = e.currentTarget as HTMLButtonElement; t.style.transform = "translateY(-1px)"; t.style.boxShadow = "0 6px 24px rgba(0,229,204,0.4)"; }}
+              onMouseLeave={(e) => { const t = e.currentTarget as HTMLButtonElement; t.style.transform = "translateY(0)"; t.style.boxShadow = "none"; }}
+            >
+              Create Account
+            </button>
+          )}
         </nav>
 
         {/* Mobile hamburger */}
@@ -801,6 +912,33 @@ function Header({
               {isSubscribed ? <Eye size={16} /> : <EyeOff size={16} />}
               {isSubscribed ? "PRO Active — Click to disable" : "Free Tier — Click to upgrade"}
             </button>
+          </div>
+
+          {/* Create Account / My Account — mobile */}
+          <div style={{ paddingTop: 8 }}>
+            {userEmail ? (
+              <div style={{ borderRadius: 12, border: "1px solid rgba(0,229,204,0.12)", overflow: "hidden" }}>
+                <div style={{ padding: "14px 16px", background: "rgba(0,229,204,0.05)", borderBottom: "1px solid rgba(0,229,204,0.08)" }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: COLORS.textSecondary, marginBottom: 6 }}>Signed in as</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{userEmail}</p>
+                  <p style={{ fontSize: 11, color: COLORS.textSecondary, marginTop: 2 }}>Password: ••••••••</p>
+                </div>
+                <button
+                  onClick={() => { onSignOut(); setMobileOpen(false); }}
+                  style={{ width: "100%", padding: "12px 16px", background: "none", border: "none", cursor: "pointer", color: "#ef4444", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 8, fontFamily: "DM Sans, sans-serif" }}
+                >
+                  <Key size={14} /> Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => { onOpenModal(); setMobileOpen(false); }}
+                className="btn-shimmer font-display"
+                style={{ width: "100%", padding: "13px 16px", borderRadius: 10, border: "none", color: "#060b18", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+              >
+                Create Account
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -1922,18 +2060,30 @@ function Footer(): React.JSX.Element {
 export default function PolyWhaleApp(): React.JSX.Element {
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
   const [modalOpen, setModalOpen]       = useState<boolean>(false);
+  const [userEmail, setUserEmail]       = useState<string | null>(null);
 
   return (
     <div style={{ background: COLORS.bg, minHeight: "100vh" }}>
       <GlobalStyles />
-      <Header isSubscribed={isSubscribed} setIsSubscribed={setIsSubscribed} />
+      <Header
+        isSubscribed={isSubscribed}
+        setIsSubscribed={setIsSubscribed}
+        onOpenModal={() => setModalOpen(true)}
+        userEmail={userEmail}
+        onSignOut={() => setUserEmail(null)}
+      />
       <Hero onOpenModal={() => setModalOpen(true)} />
       <Ticker />
       <Features />
       <HowItWorks />
       <CTABanner onOpenModal={() => setModalOpen(true)} />
       <Footer />
-      {modalOpen && <SignUpModal onClose={() => setModalOpen(false)} />}
+      {modalOpen && (
+        <SignUpModal
+          onClose={() => setModalOpen(false)}
+          onSuccess={(email) => { setUserEmail(email); setModalOpen(false); }}
+        />
+      )}
     </div>
   );
 }
