@@ -1219,6 +1219,7 @@ const TIERS: PricingTier[] = [
     icon: <Eye size={20} />,
     popular: false,
     ctaText: "Get Started Free",
+    stripeUrl: "/signup",
     borderColor: "rgba(0,229,204,0.15)",
     glowAnimation: "glow-pulse-cyan 3s ease-in-out infinite",
     features: [
