@@ -6,7 +6,7 @@ import { createClient } from "@supabase/supabase-js";
    Clients — initialised once at module level (not per-request)
 ───────────────────────────────────────────────────────────── */
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-01-27.acacia",
+  apiVersion: "2026-02-25.clover",
 });
 
 // Service-role client bypasses RLS — never expose this key to the browser
