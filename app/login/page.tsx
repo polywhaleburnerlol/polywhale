@@ -159,11 +159,9 @@ export default function LoginPage(): React.JSX.Element {
           borderBottom: "1px solid rgba(0,229,204,0.07)",
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
-          <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg, #00e5cc, #7c5cfc)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Waves size={18} color="#060b18" strokeWidth={2.5} />
-            </div>
-            <span className="font-display" style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.02em", color: "#fff" }}>
+          <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
+            <Waves size={22} color="#00e5cc" />
+            <span className="font-display" style={{ fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: "-0.01em" }}>
               Poly<span style={{ color: COLORS.accent }}>Whale</span>
             </span>
           </a>
@@ -175,34 +173,40 @@ export default function LoginPage(): React.JSX.Element {
         </nav>
 
         {/* ── Main content ── */}
-        <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "100px 24px 48px", position: "relative", zIndex: 1 }}>
-          <div style={{ width: "100%", maxWidth: 920, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
+        <main style={{
+          flex: 1, position: "relative", zIndex: 1,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "100px 24px 60px",
+        }}>
+          <div style={{
+            width: "100%", maxWidth: 900,
+            display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center",
+          }}>
 
             {/* ── Left: brand copy ── */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-              {/* Live badge */}
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 100, background: "rgba(0,229,204,0.07)", border: "1px solid rgba(0,229,204,0.14)", width: "fit-content", fontSize: 12, color: COLORS.accent, fontWeight: 600 }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: COLORS.accent, boxShadow: "0 0 8px #00e5cc", display: "inline-block" }} />
-                <Zap size={11} /> Markets live — resume your edge
+            <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+              <div>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 100, background: "rgba(0,229,204,0.07)", border: "1px solid rgba(0,229,204,0.14)", width: "fit-content", fontSize: 12, color: COLORS.accent, fontWeight: 600 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: COLORS.accent, boxShadow: "0 0 8px #00e5cc", display: "inline-block" }} />
+                  Live on Polymarket
+                </div>
+                <h1 className="font-display" style={{ marginTop: 16, fontSize: 36, fontWeight: 800, color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.15 }}>
+                  Welcome<br />
+                  <span style={{ background: "linear-gradient(90deg, #00e5cc, #7c5cfc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                    back.
+                  </span>
+                </h1>
+                <p style={{ fontSize: 15, lineHeight: 1.75, color: COLORS.textSecondary, maxWidth: 340, marginTop: 12 }}>
+                  Sign in to access your copy-trading dashboard, whale tracker, and live position feed.
+                </p>
               </div>
 
-              <h1 className="font-display" style={{ fontSize: "clamp(30px, 4vw, 48px)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", color: "#fff" }}>
-                Welcome<br />
-                <span style={{ background: "linear-gradient(135deg, #00e5cc, #7c5cfc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  back.
-                </span>
-              </h1>
-
-              <p style={{ fontSize: 15, lineHeight: 1.75, color: COLORS.textSecondary, maxWidth: 340 }}>
-                Your whale watchlist, active positions, and bot configuration are waiting. Sign in to pick up where you left off.
-              </p>
-
-              {/* Stats */}
-              <div style={{ display: "flex", gap: 28, paddingTop: 8 }}>
+              {/* Stats row */}
+              <div style={{ display: "flex", gap: 24 }}>
                 {[
-                  { val: "$48M+",  label: "Volume Tracked"  },
-                  { val: "1,200+", label: "Whales Indexed"  },
-                  { val: "<20ms",  label: "Avg. Latency"    },
+                  { val: "$2.4M",  label: "Vol. mirrored" },
+                  { val: "847",    label: "Active traders" },
+                  { val: "+31%",   label: "Avg. 30d ROI" },
                 ].map(({ val, label }) => (
                   <div key={label}>
                     <div className="font-display" style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>{val}</div>
@@ -282,7 +286,8 @@ export default function LoginPage(): React.JSX.Element {
                     <label style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: focused === "password" ? COLORS.accent : COLORS.textSecondary, transition: "color 0.2s" }}>
                       Password
                     </label>
-                    <a href="#" style={{ fontSize: 12, color: COLORS.textSecondary, textDecoration: "none", transition: "color 0.2s" }}
+                    {/* ── Fixed: now links to /forgot-password ── */}
+                    <a href="/forgot-password" style={{ fontSize: 12, color: COLORS.textSecondary, textDecoration: "none", transition: "color 0.2s" }}
                       onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = COLORS.accent)}
                       onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = COLORS.textSecondary)}>
                       Forgot password?
@@ -345,7 +350,6 @@ export default function LoginPage(): React.JSX.Element {
                   <a href="/" style={{ color: COLORS.accent, textDecoration: "none", fontWeight: 700 }}
                     onClick={(e) => {
                       e.preventDefault();
-                      // Go home and trigger the signup modal via hash
                       window.location.href = "/#signup";
                     }}>
                     Create a free account
