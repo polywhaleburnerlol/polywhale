@@ -1270,7 +1270,7 @@ function Hero({ onOpenModal }: { onOpenModal: () => void }): React.JSX.Element {
           </div>
 
           {/* Quick stats */}
-          <div style={{ display: "flex", gap: 32, marginTop: 48 }}>
+          <div id="stats" style={{ display: "flex", gap: 32, marginTop: 48 }}>
             {[
               { val: "$48M+", label: "Volume Tracked" },
               { val: "1,200+", label: "Whales Indexed" },
@@ -1857,11 +1857,29 @@ function CTABanner({ onOpenModal }: { onOpenModal: () => void }): React.JSX.Elem
    FOOTER
    ═══════════════════════════════════════ */
 function Footer(): React.JSX.Element {
-  const columns = [
-    { title: "Product",   links: ["Dashboard", "Whale Index", "Analytics", "API"] },
-    { title: "Resources", links: ["Documentation", "Tutorials", "Blog", "Changelog"] },
-    { title: "Community", links: ["Discord", "Twitter / X", "Telegram", "GitHub"] },
-    { title: "Legal",     links: ["Terms of Service", "Privacy Policy", "Risk Disclosure"] },
+  const columns: { title: string; links: { label: string; href: string }[] }[] = [
+    { title: "Product", links: [
+      { label: "Dashboard",   href: "https://polywhale-dashboard-1qhh.vercel.app/" },
+      { label: "Whale Index", href: "/whales" },
+      { label: "Analytics",   href: "/#stats" },
+    ]},
+    { title: "Resources", links: [
+      { label: "Documentation", href: "#" },
+      { label: "Tutorials",     href: "#" },
+      { label: "Blog",          href: "#" },
+      { label: "Changelog",     href: "#" },
+    ]},
+    { title: "Community", links: [
+      { label: "Discord",     href: "#" },
+      { label: "Twitter / X", href: "#" },
+      { label: "Telegram",    href: "#" },
+      { label: "GitHub",      href: "#" },
+    ]},
+    { title: "Legal", links: [
+      { label: "Terms of Service", href: "#" },
+      { label: "Privacy Policy",   href: "#" },
+      { label: "Risk Disclosure",  href: "#" },
+    ]},
   ];
 
   return (
@@ -1929,12 +1947,12 @@ function Footer(): React.JSX.Element {
                 {col.links.map((link, j) => (
                   <li key={j} style={{ marginBottom: 10 }}>
                     <a
-                      href="#"
+                      href={link.href}
                       style={{ color: COLORS.textSecondary, textDecoration: "none", fontSize: 13, transition: "color 0.2s" }}
                       onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = COLORS.accent)}
                       onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = COLORS.textSecondary)}
                     >
-                      {link}
+                      {link.label}
                     </a>
                   </li>
                 ))}
