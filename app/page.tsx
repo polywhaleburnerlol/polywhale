@@ -1863,12 +1863,6 @@ function Footer(): React.JSX.Element {
       { label: "Whale Index", href: "/whales" },
       { label: "Analytics",   href: "/#stats" },
     ]},
-    { title: "Resources", links: [
-      { label: "Documentation", href: "#" },
-      { label: "Tutorials",     href: "#" },
-      { label: "Blog",          href: "#" },
-      { label: "Changelog",     href: "#" },
-    ]},
     { title: "Community", links: [
       { label: "Discord",     href: "#" },
       { label: "Twitter / X", href: "#" },
