@@ -160,14 +160,10 @@ function GlobalStyles(): React.JSX.Element {
    HEADER
    ═══════════════════════════════════════ */
 function Header({
-  isSubscribed,
-  setIsSubscribed,
   onOpenModal,
   userEmail,
   onSignOut,
 }: {
-  isSubscribed: boolean;
-  setIsSubscribed: (v: boolean) => void;
   onOpenModal: () => void;
   userEmail: string | null;
   onSignOut: () => void;
@@ -379,54 +375,6 @@ function Header({
             )}
           </div>
 
-          {/* PRO toggle */}
-          <button
-            onClick={() => setIsSubscribed(!isSubscribed)}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "8px 16px",
-              borderRadius: 8,
-              border: `1px solid ${isSubscribed ? "rgba(0,229,204,0.3)" : "rgba(124,92,252,0.3)"}`,
-              background: isSubscribed ? "rgba(0,229,204,0.08)" : "rgba(124,92,252,0.08)",
-              color: isSubscribed ? COLORS.accent : COLORS.accentAlt,
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: "pointer",
-              fontFamily: "DM Sans, sans-serif",
-              whiteSpace: "nowrap",
-              transition: "all 0.3s ease",
-            }}
-          >
-            {isSubscribed ? <Eye size={14} /> : <EyeOff size={14} />}
-            {isSubscribed ? "PRO Active" : "Free Tier"}
-            <div
-              style={{
-                width: 32,
-                height: 18,
-                borderRadius: 9,
-                background: isSubscribed ? "rgba(0,229,204,0.3)" : "rgba(255,255,255,0.1)",
-                position: "relative",
-                transition: "background 0.3s ease",
-              }}
-            >
-              <div
-                style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  background: isSubscribed ? COLORS.accent : COLORS.textSecondary,
-                  position: "absolute",
-                  top: 2,
-                  left: isSubscribed ? 16 : 2,
-                  transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
-                  boxShadow: isSubscribed ? "0 0 8px rgba(0,229,204,0.5)" : "none",
-                }}
-              />
-            </div>
-          </button>
-
           {/* ── Create Account / My Account ── */}
           {userEmail ? (
             <div ref={accountRef} style={{ position: "relative" }}>
@@ -472,7 +420,7 @@ function Header({
                     </div>
                   </div>
                   {[
-                    { label: "Dashboard", href: "/dashboard", icon: <Activity size={13} /> },
+                    { label: "Dashboard", href: "https://polywhale-dashboard-1qhh.vercel.app/", icon: <Activity size={13} /> },
                     { label: "Pricing",   href: "/pricing",   icon: <TrendingUp size={13} /> },
                   ].map(({ label, href, icon }) => (
                     <a key={label} href={href} onClick={() => setAccountOpen(false)}
@@ -580,26 +528,6 @@ function Header({
               </a>
             ))}
           </div>
-          <button
-            onClick={() => { setIsSubscribed(!isSubscribed); setMobileOpen(false); }}
-            style={{
-              padding: "10px 16px",
-              borderRadius: 8,
-              border: `1px solid ${isSubscribed ? "rgba(0,229,204,0.3)" : "rgba(124,92,252,0.3)"}`,
-              background: isSubscribed ? "rgba(0,229,204,0.08)" : "rgba(124,92,252,0.08)",
-              color: isSubscribed ? COLORS.accent : COLORS.accentAlt,
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: "pointer",
-              fontFamily: "DM Sans, sans-serif",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            {isSubscribed ? <Eye size={14} /> : <EyeOff size={14} />}
-            {isSubscribed ? "PRO Active — Click to disable" : "Free Tier — Click to upgrade"}
-          </button>
 
           {/* Create Account / My Account — mobile */}
           <div style={{ paddingTop: 4 }}>
@@ -1440,7 +1368,6 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }): Reac
    ═══════════════════════════════════════ */
 export default function PricingPage(): React.JSX.Element {
   const [annual, setAnnual]           = useState<boolean>(false);
-  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
   const [modalOpen, setModalOpen]     = useState<boolean>(false);
   const [userEmail, setUserEmail]     = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
@@ -1535,8 +1462,6 @@ export default function PricingPage(): React.JSX.Element {
       />
 
       <Header
-        isSubscribed={isSubscribed}
-        setIsSubscribed={setIsSubscribed}
         onOpenModal={() => setModalOpen(true)}
         userEmail={userEmail}
         onSignOut={() => {
