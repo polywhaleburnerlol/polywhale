@@ -1805,10 +1805,14 @@ export default function PricingPage(): React.JSX.Element {
               &copy; 2026 PolyWhale. All rights reserved. Prediction markets involve risk.
             </span>
             <div style={{ display: "flex", gap: 16 }}>
-              {["Terms", "Privacy", "Risk Disclosure"].map((s, i) => (
+              {[
+                { label: "Terms",            href: "/terms" },
+                { label: "Privacy",          href: "/privacy" },
+                { label: "Risk Disclosure",  href: "/risk-disclosure" },
+              ].map((item, i) => (
                 <a
                   key={i}
-                  href="#"
+                  href={item.href}
                   style={{
                     fontSize: 12,
                     color: COLORS.textSecondary,
@@ -1822,7 +1826,7 @@ export default function PricingPage(): React.JSX.Element {
                     ((e.currentTarget as HTMLAnchorElement).style.color = COLORS.textSecondary)
                   }
                 >
-                  {s}
+                  {item.label}
                 </a>
               ))}
             </div>

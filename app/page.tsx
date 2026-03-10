@@ -1870,9 +1870,9 @@ function Footer(): React.JSX.Element {
       { label: "GitHub",      href: "#" },
     ]},
     { title: "Legal", links: [
-      { label: "Terms of Service", href: "#" },
-      { label: "Privacy Policy",   href: "#" },
-      { label: "Risk Disclosure",  href: "#" },
+      { label: "Terms of Service", href: "/terms" },
+      { label: "Privacy Policy",   href: "/privacy" },
+      { label: "Risk Disclosure",  href: "/risk-disclosure" },
     ]},
   ];
 

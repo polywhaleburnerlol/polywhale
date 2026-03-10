@@ -2092,11 +2092,15 @@ export default function HowItWorksPage() {
               &copy; 2026 PolyWhale. All rights reserved. Prediction markets involve risk.
             </span>
             <div style={{ display:"flex", gap:16 }}>
-              {["Terms","Privacy","Risk Disclosure"].map((s,i)=>(
-                <a key={i} href="#" style={{ fontSize:11, color:C.textDim, textDecoration:"none", transition:"color 0.2s" }}
+              {[
+                { label: "Terms",           href: "/terms" },
+                { label: "Privacy",         href: "/privacy" },
+                { label: "Risk Disclosure", href: "/risk-disclosure" },
+              ].map((item,i)=>(
+                <a key={i} href={item.href} style={{ fontSize:11, color:C.textDim, textDecoration:"none", transition:"color 0.2s" }}
                   onMouseEnter={e=>((e.currentTarget as HTMLAnchorElement).style.color=C.accent)}
                   onMouseLeave={e=>((e.currentTarget as HTMLAnchorElement).style.color=C.textDim)}
-                >{s}</a>
+                >{item.label}</a>
               ))}
             </div>
           </div>
